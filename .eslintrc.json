@@ -32,6 +32,7 @@
       "react-hooks/rules-of-hooks": "error",
       "react/jsx-props-no-spreading": "off",
       "react/jsx-indent-props": "off",
+      "no-unused-expressions": "off",
       "@typescript-eslint/ban-types":  "off",
       "react/prop-types": "off",
       "react-hooks/exhaustive-deps": "warn",
