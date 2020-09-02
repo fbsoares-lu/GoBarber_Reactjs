@@ -1,26 +1,54 @@
-import React, { createContext, useCallback, useContext } from 'react';
+import React, { createContext, useCallback, useContext, useState } from 'react';
+import { uuid } from 'uuidv4';
+
 import ToasteContainer from '../components/ToastContainer';
 
 interface ToastContextData {
-    addToast(): void;
-    removeToast(): void;
+    addToast(message: Omit<ToastMessage, 'id'>): void;
+    removeToast(id: string): void;
+}
+
+export interface ToastMessage {
+    // Estou exportando essa inerface para tipar o ToastContainer
+    id: string;
+    type?: 'success' | 'info' | 'error';
+    title: string;
+    description?: string;
 }
 
 const ToastContext = createContext<ToastContextData>({} as ToastContextData);
 
 const ToastProvider: React.FC = ({ children }) => {
-    const addToast = useCallback(() => {
-        console.log('addToast');
-    }, []);
+    const [messages, setMessages] = useState<ToastMessage[]>([]);
 
-    const removeToast = useCallback(() => {
-        console.log('removeToast');
+    const addToast = useCallback(
+        ({ title, description, type }: Omit<ToastMessage, 'id'>) => {
+            const id = uuid();
+            const toast = {
+                id,
+                title,
+                description,
+                type,
+            };
+            /**
+             * O normal que fazemos é utilizar o estado abaixo
+             * setMessages([...messages, toast]);
+             * Mas vamos fazer um outra maneira (opicional)
+             */
+            setMessages(state => [...state, toast]);
+        },
+        [],
+    );
+
+    const removeToast = useCallback((id: string) => {
+        setMessages(state => state.filter(message => message.id !== id));
     }, []);
 
     return (
         <ToastContext.Provider value={{ addToast, removeToast }}>
             {children}
-            <ToasteContainer />
+            <ToasteContainer message={messages} />
+            {/** Vamos passar as nossas informaçoes para o ToastContainer */}
         </ToastContext.Provider>
     );
 };
